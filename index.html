@@ -1,0 +1,571 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>منصة المذاكرة | المهندس 3LI</title>
+<style>
+  :root {
+    --bg: #000000;
+    --bg2: #0a0a0a;
+    --card: #121212;
+    --card2: #181818;
+    --accent: #6c8cff;
+    --accent2: #a06cff;
+    --text: #ffffff;
+    --muted: #888888;
+    --border: #222222;
+    --modal-bg: #0a0a0a;
+    --correct: #2e7d32;
+    --wrong: #c62828;
+  }
+
+  [data-theme="light"] {
+    --bg: #f4f6fc;
+    --bg2: #ffffff;
+    --card: #ffffff;
+    --card2: #f0f3ff;
+    --accent: #4a6cf7;
+    --accent2: #7b4aff;
+    --text: #1a1d2e;
+    --muted: #626880;
+    --border: #e2e7f5;
+    --modal-bg: #ffffff;
+    --correct: #4caf50;
+    --wrong: #ef5350;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Segoe UI', Tahoma, sans-serif; transition: background-color 0.3s, color 0.3s, border-color 0.3s; }
+  body {
+    background: var(--bg);
+    color: var(--text);
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+  }
+
+  header {
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 16px 28px; background: var(--bg2);
+    border-bottom: 1px solid var(--border);
+    position: sticky; top: 0; z-index: 10;
+  }
+  .logo { display: flex; align-items: center; gap: 12px; cursor: pointer; }
+  .logo-badge {
+    width: 42px; height: 42px; border-radius: 12px;
+    background: linear-gradient(135deg, #ffb347, #ffcc00);
+    display: flex; align-items: center; justify-content: center;
+    font-weight: 800; font-size: 15px; color: #000000;
+    box-shadow: 0 4px 15px rgba(255,204,0,.3);
+  }
+  .logo-text b { display: block; font-size: 16px; }
+  .logo-text span { font-size: 12px; color: var(--muted); }
+
+  .header-actions { display: flex; align-items: center; gap: 10px; }
+  .btn-action {
+    background: var(--card); border: 1px solid var(--border);
+    color: var(--text); padding: 8px 14px; border-radius: 20px;
+    cursor: pointer; font-size: 13px; font-weight: 600;
+    display: flex; align-items: center; gap: 6px;
+  }
+  .btn-action:hover { border-color: var(--accent); }
+
+  .btn-rate {
+    background: linear-gradient(135deg, #ffb347, #ffcc00);
+    color: #000000; font-weight: 700; padding: 8px 16px; border-radius: 20px;
+    border: none; cursor: pointer; font-size: 13px; display: flex; align-items: center; gap: 6px;
+  }
+  .btn-rate:hover { transform: scale(1.03); }
+
+  main { flex: 1; max-width: 1000px; width: 100%; margin: 0 auto; padding: 36px 20px 60px; }
+
+  .crumbs { display: flex; flex-wrap: wrap; gap: 8px; font-size: 13px; color: var(--muted); margin-bottom: 24px; align-items: center; }
+  .crumbs span.sep { opacity: .5; }
+  .crumbs span.crumb-link { cursor: pointer; text-decoration: underline; text-underline-offset: 3px; }
+  .crumbs span.crumb-link:hover { color: #ffcc00; }
+  .crumbs .active { color: var(--accent); font-weight: 600; cursor: default; text-decoration: none; }
+
+  h1.title { font-size: 26px; margin-bottom: 6px; }
+  p.subtitle { color: var(--muted); font-size: 14px; margin-bottom: 28px; }
+
+  .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(230px, 1fr)); gap: 16px; }
+  .card {
+    background: var(--card); border: 1px solid var(--border);
+    border-radius: 16px; padding: 22px 20px; cursor: pointer;
+    display: flex; flex-direction: column; gap: 10px; position: relative; overflow: hidden;
+  }
+  .card:hover { transform: translateY(-4px); border-color: #ffcc00; box-shadow: 0 10px 25px rgba(255,204,0,.15); }
+  .card .icon { font-size: 24px; }
+  .card .name { font-size: 16px; font-weight: 700; }
+  .card .desc { font-size: 12.5px; color: var(--muted); line-height: 1.7; }
+
+  .quiz-container { display: flex; flex-direction: column; gap: 24px; }
+  .q-card {
+    background: var(--card); border: 1px solid var(--border);
+    border-radius: 16px; padding: 24px; display: flex; flex-direction: column; gap: 16px;
+  }
+  .q-title { font-size: 17px; font-weight: 700; line-height: 1.5; color: #ffcc00; dir: ltr; text-align: left; }
+  .q-sub { font-size: 14.5px; color: var(--muted); line-height: 1.6; margin-top: -8px; }
+  
+  .question-image-box {
+    width: 100%; border: 1px solid var(--border); border-radius: 12px;
+    overflow: hidden; background: #000; text-align: center; padding: 10px;
+  }
+  .question-image-box img {
+    max-width: 100%; height: auto; border-radius: 8px; display: block; margin: 0 auto;
+  }
+
+  .answer-box {
+    background: var(--card2); border-right: 4px solid var(--accent);
+    padding: 16px; border-radius: 8px; font-size: 14.5px; line-height: 1.8;
+  }
+  .answer-en { dir: ltr; text-align: left; font-weight: 600; color: var(--text); margin-bottom: 8px; }
+  .answer-ar { dir: rtl; text-align: right; color: var(--muted); border-top: 1px dashed var(--border); padding-top: 8px; }
+
+  .explanation-box {
+    background: rgba(108, 140, 255, 0.05); border-right: 4px solid #ffcc00;
+    padding: 16px; border-radius: 8px; font-size: 13.5px; line-height: 1.7;
+  }
+  .exp-en { dir: ltr; text-align: left; color: var(--text); margin-bottom: 10px; }
+  .exp-ar { dir: rtl; text-align: right; color: var(--muted); border-top: 1px dashed var(--border); padding-top: 10px; }
+
+  .soon-box {
+    margin-top: 30px; background: var(--card); border: 1px dashed var(--border);
+    border-radius: 16px; padding: 50px 20px; text-align: center;
+  }
+  .soon-box .emoji { font-size: 40px; margin-bottom: 12px; }
+  .soon-box h2 { font-size: 20px; margin-bottom: 8px; }
+  .soon-box p { color: var(--muted); font-size: 14px; }
+
+  .btn {
+    background: transparent; border: 1px solid var(--border); color: var(--text);
+    padding: 10px 18px; border-radius: 10px; cursor: pointer; font-size: 14px;
+  }
+  .btn:hover { border-color: var(--accent); color: var(--accent); }
+  .back { margin-top: 26px; }
+
+  .modal-overlay {
+    position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+    background: rgba(0,0,0,.8); backdrop-filter: blur(4px);
+    display: none; justify-content: center; align-items: center; z-index: 100;
+  }
+  .modal-overlay.active { display: flex; }
+  .modal-content {
+    background: var(--modal-bg); border: 1px solid var(--border); border-radius: 20px;
+    width: 90%; max-width: 600px; height: 80vh; display: flex; flex-direction: column; overflow: hidden;
+  }
+  .modal-header {
+    padding: 16px 20px; background: var(--card2); border-bottom: 1px solid var(--border);
+    display: flex; justify-content: space-between; align-items: center;
+  }
+  .modal-header h3 { font-size: 16px; color: var(--text); }
+  .close-modal { background: none; border: none; color: var(--muted); font-size: 20px; cursor: pointer; }
+  .modal-body { flex: 1; }
+  .modal-body iframe { width: 100%; height: 100%; border: none; }
+
+  footer {
+    background: var(--bg2); border-top: 1px solid var(--border);
+    padding: 26px 28px; font-size: 12.5px; color: var(--muted); line-height: 1.9;
+  }
+  footer .foot-inner { max-width: 1000px; margin: 0 auto; display: flex; flex-direction: column; gap: 12px; }
+  footer .disclaimer b { color: #ffb347; }
+  footer .copy {
+    display: flex; justify-content: space-between; flex-wrap: wrap; gap: 10px;
+    border-top: 1px solid var(--border); padding-top: 14px; align-items: center;
+  }
+  footer .copy .brand { color: #ffcc00; font-weight: 700; }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="logo" onclick="goHome()">
+    <div class="logo-badge">3LI</div>
+    <div class="logo-text">
+      <b id="txt-logo-title">المهندس 3LI</b>
+      <span id="txt-logo-sub">منصة المذاكرة التفاعلية</span>
+    </div>
+  </div>
+  <div class="header-actions">
+    <button class="btn-action" id="langBtn" onclick="toggleLang()">🌐 English</button>
+    <button class="btn-action" id="themeBtn" onclick="toggleTheme()">🌙 داكن</button>
+    <button class="btn-rate" id="txt-rate-btn" onclick="openModal()">⭐ التقييم</button>
+  </div>
+</header>
+
+<main>
+  <div class="crumbs" id="crumbs"></div>
+  <div id="view"></div>
+</main>
+
+<div class="modal-overlay" id="rateModal">
+  <div class="modal-content">
+    <div class="modal-header">
+      <h3 id="txt-modal-title">⭐ تقييم منصة المذاكرة | المهندس 3LI</h3>
+      <button class="close-modal" onclick="closeModal()">✕</button>
+    </div>
+    <div class="modal-body">
+      <iframe src="https://docs.google.com/forms/d/e/1FAIpQLSewO8PUyTpMNCvPX1QDVz7V_CRymhSp1vptZ9GbaZKGchbnZw/viewform?embedded=true">Loading…</iframe>
+    </div>
+  </div>
+</div>
+
+<footer>
+  <div class="foot-inner">
+    <div class="disclaimer" id="txt-disclaimer">
+      <b>⚠️ تنبيه وإخلاء مسؤولية:</b> هذا الموقع هو جهد استرشادي وداعم للمذاكرة جرى إعداده بواسطة المهندس 3LI لمساعدة الطلاب.
+    </div>
+    <div class="copy">
+      <span id="txt-copy">© 2026 جميع الحقوق محفوظة — <span class="brand">المهندس 3LI</span></span>
+      <button class="btn-rate" id="txt-foot-rate" onclick="openModal()">⭐ شاركنا رأيك وتقييمك</button>
+    </div>
+  </div>
+</footer>
+
+<script>
+const i18n = {
+  ar: {
+    logoTitle: "المهندس 3LI", logoSub: "منصة المذاكرة التفاعلية", rateBtn: "⭐ التقييم", modalTitle: "⭐ تقييم منصة المذاكرة | المهندس 3LI",
+    disclaimer: "<b>⚠️ تنبيه وإخلاء مسؤولية:</b> هذا الموقع هو جهد استرشادي وداعم للمذاكرة جرى إعداده بواسطة المهندس 3LI.",
+    copy: "© 2026 جميع الحقوق محفوظة — <span class=\"brand\">المهندس 3LI</span>", footRate: "⭐ شاركنا رأيك وتقييمك",
+    home: "الرئيسية", selectSubjectTitle: "اختر المادة", selectSubjectSub: "اختر المادة اللي تبغى تراجعها من مواد الترم الخامس",
+    natureTitle: "طبيعة المادة", natureSub: "هل المادة عملي ولا نظري؟", examTitle: "نوع الاختبار", examSub: "اختر نوع الاختبار اللي تذاكر له",
+    patternTitle: "نمط الأسئلة", patternSub: "اختر نمط الأسئلة اللي تبغى تتدرب عليه", soonTitle: "قريباً",
+    soonDesc: "هذا القسم قيد الإعداد، بيتم إضافة الأسئلة هنا قريباً بإذن الله.", back: "↩ رجوع", backHome: "↩ رجوع للرئيسية", practical: "عملي", theory: "نظري"
+  },
+  en: {
+    logoTitle: "Eng. 3LI", logoSub: "Interactive Study Platform", rateBtn: "⭐ Rate Us", modalTitle: "⭐ Platform Feedback | Eng. 3LI",
+    disclaimer: "<b>⚠️ Disclaimer:</b> Educational study aid prepared by Eng. 3LI.",
+    copy: "© 2026 All Rights Reserved — <span class=\"brand\">Eng. 3LI</span>", footRate: "⭐ Share Your Feedback",
+    home: "Home", selectSubjectTitle: "Select Subject", selectSubjectSub: "Choose the course for 5th Semester",
+    natureTitle: "Course Type", natureSub: "Practical or theoretical?", examTitle: "Exam Type", examSub: "Select your exam",
+    patternTitle: "Question Pattern", patternSub: "Choose question style", soonTitle: "Coming Soon",
+    soonDesc: "This section is under development.", back: "↩ Back", backHome: "↩ Back to Home", practical: "Practical", theory: "Theory"
+  }
+};
+
+let currentLang = 'ar';
+function initLang() { currentLang = localStorage.getItem('lang') || 'ar'; applyLang(); }
+function toggleLang() { currentLang = currentLang === 'ar' ? 'en' : 'ar'; localStorage.setItem('lang', currentLang); applyLang(); render(); }
+function applyLang() {
+  document.documentElement.setAttribute('lang', currentLang);
+  document.documentElement.setAttribute('dir', currentLang === 'ar' ? 'rtl' : 'ltr');
+  document.getElementById('langBtn').innerText = currentLang === 'ar' ? '🌐 English' : '🌐 العربية';
+  const t = i18n[currentLang];
+  document.getElementById('txt-logo-title').innerText = t.logoTitle;
+  document.getElementById('txt-logo-sub').innerText = t.logoSub;
+  document.getElementById('txt-rate-btn').innerText = t.rateBtn;
+  document.getElementById('txt-modal-title').innerText = t.modalTitle;
+  document.getElementById('txt-disclaimer').innerHTML = t.disclaimer;
+  document.getElementById('txt-copy').innerHTML = t.copy;
+  document.getElementById('txt-foot-rate').innerText = t.footRate;
+}
+
+function initTheme() { const savedTheme = localStorage.getItem('theme') || 'dark'; document.documentElement.setAttribute('data-theme', savedTheme); updateThemeBtn(savedTheme); }
+function toggleTheme() { const ct = document.documentElement.getAttribute('data-theme'); const nt = ct === 'light' ? 'dark' : 'light'; document.documentElement.setAttribute('data-theme', nt); localStorage.setItem('theme', nt); updateThemeBtn(nt); }
+function updateThemeBtn(t) { document.getElementById('themeBtn').innerText = t === 'light' ? '☀️ Light' : '🌙 Dark'; }
+initTheme(); initLang();
+
+const subjects = [
+  {id:'circuits',   name:{ar:'دوائر كهربائية', en:'Electric Circuits'}, icon:'⚡', desc:{ar:'تحليل الدوائر والتيار والجهد', en:'Circuit Analysis'}},
+  {id:'networks',   name:{ar:'شبكات الحاسب', en:'Computer Networks'}, icon:'🌐', desc:{ar:'الطبقات والبروتوكولات', en:'Layers & Protocols'}},
+  {id:'signals',    name:{ar:'الإشارات والنظم', en:'Signals & Systems'}, icon:'📈', desc:{ar:'الإشارات المستمرة والمتقطعة', en:'Signals'}},
+  {id:'dsa',        name:{ar:'هياكل البيانات وخوارزميات الشبكات', en:'Data Structures & Network Algorithms'}, icon:'🧩', desc:{ar:'الهياكل والخوارزميات', en:'Structures & Algorithms'}},
+  {id:'stats',      name:{ar:'الإحصاء الاحتمالات', en:'Statistics & Probability'}, icon:'📊', desc:{ar:'التوزيعات والاحتمالات', en:'Probability'}},
+  {id:'db',         name:{ar:'مفاهيم وتصميم قواعد البيانات', en:'Database Concepts & Design'}, icon:'🗄️', desc:{ar:'التصميم والعلاقات', en:'DB Design'}},
+];
+
+const patterns = [
+  {id:'mcq',   name:{ar:'اختيارات (MCQs)', en:'Multiple Choice (MCQs)'}, icon:'🔘'},
+  {id:'short', name:{ar:'إجابات قصيرة (Short Answer)', en:'Short Answer'}, icon:'✏️'},
+  {id:'long',  name:{ar:'إجابات طويلة / علل (Long Answer)', en:'Long Answer'}, icon:'📄'},
+];
+
+/* ===== قاعدة البيانات بالصور المباشرة H1.png, H2.png ... ===== */
+const quizData = {
+  // === 1. قسم الأسئلة القصيرة (SHORT) ===
+  "dsa_theory_midterm_short": [
+    {
+      titleEn: "Q1. What is Stack? Explain with the help of diagram.",
+      titleAr: "س1. ما هو المكدس (Stack)؟ اشرح ذلك بمساعدة الرسم التوضيحي.",
+      imageSrc: "images/H1.png", // تم ربط الصورة H1
+      ansEn: "A Stack is a linear data structure that follows the LIFO (Last-In, First-Out) principle.",
+      ansAr: "الإجابة بالعربي: المكدس (Stack) هو هيكل بيانات خطي يتبع مبدأ (آخر من يدخل، أول من يخرج - LIFO).",
+      expEn: "Operations: push() -> (insert), pop() -> (remove), peek() -> (top element).",
+      expAr: "التوضيح والعمليات:<br>• push(): لإضافة عنصر في قمة المكدس.<br>• pop(): لحذف العنصر من قمة المكدس.<br>• peek(): لاستعراض العنصر العلوي دون حذفه."
+    },
+    {
+      titleEn: "Q2. Write the complexity for the following piece of code and overall code.",
+      titleAr: "س2. اكتب التعقيد الزمني لجزئيات الكود التالية وللكود كاملاً.",
+      imageSrc: "images/H2.png", // تم ربط الصورة H2
+      ansEn: "case 'a': O(n)<br>case 'b': O(n²)<br>Overall Complexity: O(n²)",
+      ansAr: "الإجابة بالعربي:<br>• الفقرة 'a': التعقيد الزمني هو O(n)<br>• الفقرة 'b': التعقيد الزمني هو O(n²)<br>• التعقيد الكلي للكود (Overall Complexity): هو O(n²)"
+    },
+    {
+      titleEn: "Q3. Consider the following tree and answer the questions:",
+      titleAr: "س3. بالنظر إلى الشجرة التالية، أجب عن الأسئلة التالية:",
+      imageSrc: "images/H3.png", // تم ربط الصورة H3
+      ansEn: `
+        (a) How many edges are in this tree? -> 8 edges<br>
+        (b) What do we call node "w"? -> Leaf node<br>
+        (c) Which node(s) is(are) the leaves of this tree? -> A, K, W, C, X<br>
+        (d) Which node(s) is(are) the ancestors of this tree? -> Q, B, M, R<br>
+        (e) Is it a binary tree? -> No, because node Q has 3 children.<br>
+        (f) What is the height of a tree with only one node (the root)? -> 0
+      `,
+      ansAr: `
+        الإجابة والترجمة بالعربي:<br>
+        (a) كم عدد الحواف في هذه الشجرة؟ ➔ الإجابة: 8 حواف (Edges).<br>
+        (b) ماذا نسمي العقدة "w"؟ ➔ الإجابة: عقدة ورقة (Leaf node).<br>
+        (c) ما هي العقد التي تعتبر أوراقاً في هذه الشجرة؟ ➔ الإجابة: العقد A, K, W, C, X.<br>
+        (d) ما هي العقد التي تعتبر أسلافاً (Ancestors) في هذه الشجرة؟ ➔ الإجابة: العقد Q, B, M, R.<br>
+        (e) هل هذه شجرة ثنائية؟ ➔ الإجابة: لا، لأن العقدة Q تحتوي على 3 أبناء.<br>
+        (f) ما هو ارتفاع شجرة تحتوي على عقدة واحدة فقط (الجذر)؟ ➔ الإجابة: 0.
+      `
+    },
+    {
+      titleEn: "Q4. Compare the complexity of any three sorting algorithms.",
+      titleAr: "س4. قارن بين تعقيد أي ثلاث خوارزميات ترتيب مع الشرح.",
+      ansEn: `
+        Bubble Sort: Best = O(n) | Worst = O(n²)<br>
+        Merge Sort: Best = O(n log n) | Worst = O(n log n)<br>
+        Quick Sort: Best = O(n log n) | Worst = O(n²)
+      `,
+      ansAr: `
+        الإجابة بالعربي:<br>
+        • خوارزمية الترتيب الفقاعي (Bubble Sort): أفضل حالة = O(n) | أسوأ حالة = O(n²)<br>
+        • خوارزمية الترتيب بالدمج (Merge Sort): أفضل حالة = O(n log n) | أسوأ حالة = O(n log n)<br>
+        • خوارزمية الترتيب السريع (Quick Sort): أفضل حالة = O(n log n) | أسوأ حالة = O(n²)
+      `,
+      expEn: `
+        Simplified explanation for complexity:<br>
+        1. Bubble Sort: Compares adjacent elements. Worst O(n²) when reversed; Best O(n) when already sorted.<br>
+        2. Merge Sort: Uses Divide and Conquer. Constant performance O(n log n) in all cases.<br>
+        3. Quick Sort: Uses a Pivot element. Best O(n log n) when split evenly; Worst O(n²) with bad pivot choice.
+      `,
+      expAr: `
+        شرح مبسط وواضح لسبب هذا التعقيد بالعربي:<br><br>
+        1. <strong>خوارزمية الفقاعة (Bubble Sort):</strong><br>
+        • <em>الفكرة:</em> تقارن كل عنصرين متجاورين وتدفع العنصر الأكبر للجهة اليمنى.<br>
+        • <em>السبب:</em> أسوأ حالة O(n²) في حال كانت المصفوفة معكوسة، وأفضل حالة O(n) إذا كانت مرتبة جاهزة.<br><br>
+        2. <strong>خوارزمية الدمج (Merge Sort):</strong><br>
+        • <em>الفكرة:</em> تقسم المصفوفة لنصفين، وترتب كل نصف، ثم تدمجهما (Divide and Conquer).<br>
+        • <em>السبب:</em> أداؤها ثابت O(n log n) دائماً لأن التقسيم يستغرق log n والدمج يستغرق n.<br><br>
+        3. <strong>خوارزمية الترتيب السريع (Quick Sort):</strong><br>
+        • <em>الفكرة:</em> تختار عنصر محور (Pivot) وتضع الأصغر على يساره والأكبر على يمينه.<br>
+        • <em>السبب:</em> أفضل حالة O(n log n) عند الانقسام المتوازن، وأسوأ حالة O(n²) عند اختيار محور غير مناسب.
+      `
+    },
+    {
+      titleEn: "Q5. Write a short note on Big-O Notation.",
+      titleAr: "س5. اكتب نبذة قصيرة عن ترميز Big-O.",
+      ansEn: "Big-O Notation represents the upper bound (worst-case scenario) of an algorithm's execution time or space complexity (e.g., O(1), O(n), O(n²)).",
+      ansAr: "الإجابة بالعربي: يمثل ترميز Big-O الحد الأعلى (أسوأ حالة متوقعة - Worst-case) لوقت تنفيذ الخوارزمية أو التعقيد المكاني في الذاكرة.",
+      expEn: `
+        Basic Concept: Mathematical way to measure algorithm efficiency as input size (n) grows.<br>
+        • O(1) -> Constant time.<br>
+        • O(n) -> Linear time.<br>
+        • O(n²) -> Quadratic time (Nested Loops).
+      `,
+      expAr: `
+        شرح بسيط ومباشر جداً لـ Big-O Notation بالعربي:<br>
+        • <strong>الفكرة الأساسية:</strong> هي طريقة رياضية تُستخدم لقياس كفاءة الخوارزمية وسرعتها مع زيادة حجم البيانات (n).<br>
+        • <strong>أسوأ حالة (Worst-case):</strong> تعبر عن أقصى وقت أو مساحة قد تستغرقها الخوارزمية.<br><br>
+        <strong>أمثلة بسيطة للتوضيح:</strong><br>
+        • O(1) ➔ ثابت: الوقت لا يتغير مهما زادت البيانات.<br>
+        • O(n) ➔ خطي: الوقت يزداد بنفس نسبة زيادة البيانات.<br>
+        • O(n²) ➔ تربيعي: الوقت يضاعف بشكل كبير مع زيادة البيانات.
+      `
+    }
+  ],
+
+  // === 2. قسم الأسئلة الطويلة (LONG) ===
+  "dsa_theory_midterm_long": [
+    {
+      titleEn: "Q6. Write the program for stack to demonstrate its operations.",
+      titleAr: "س6. اكتب برنامجاً للمكدس (Stack) لتوضيح عملياته.",
+      imageSrc: "images/H4.png", // تم ربط الصورة H4
+      expEn: `
+        Code Breakdown:<br>
+        • 'public interface Stack extends Container': Defines a Stack interface inheriting from Container.<br>
+        • 'public abstract Object getTop();': Method to inspect the top element without removing it.<br>
+        • 'public abstract void push(Object obj);': Method to insert a new element at the top.<br>
+        • 'public abstract Object pop();': Method to remove and return the top element.
+      `,
+      expAr: `
+        شرح بسيط للكود بالعربي:<br>
+        • <code>public interface Stack extends Container</code>: يعرّف واجهة (Interface) للمكدس ترث من واجهة Container.<br>
+        • <code>public abstract Object getTop();</code>: دالة لاستعراض العنصر الموجود في أعلى المكدس دون حذفه.<br>
+        • <code>public abstract void push(Object obj);</code>: دالة لإضافة عنصر جديد (obj) إلى أعلى المكدس.<br>
+        • <code>public abstract Object pop();</code>: دالة لحذف وإرجاع العنصر الموجود في أعلى المكدس.
+      `
+    },
+    {
+      titleEn: "Q7. What is Queue? Explain with the help of diagram.",
+      titleAr: "س7. ما هو الطابور (Queue)؟ اشرح ذلك مع الرسم التوضيحي.",
+      imageSrc: "images/H5.png", // إذا كان لديك صورة H5 للطابور
+      ansEn: "A Queue is a linear data structure that follows the FIFO (First-In, First-Out) principle.",
+      ansAr: "الإجابة بالعربي: الطابور (Queue) هو هيكل بيانات خطي يتبع مبدأ (أول من يدخل، أول من يخرج - FIFO).",
+      expEn: "Operations: enqueue() (add at Rear), dequeue() (remove from Front).",
+      expAr: "التوضيح والعمليات بالعربي:<br>• enqueue(): إضافة عنصر جديد في نهاية الطابور (Rear).<br>• dequeue(): حذف عنصر من بداية الطابور (Front)."
+    }
+  ]
+};
+
+let state = { subject:null, nature:null, exam:null, pattern:null };
+
+function openModal(){ document.getElementById('rateModal').classList.add('active'); }
+function closeModal(){ document.getElementById('rateModal').classList.remove('active'); }
+
+const view = document.getElementById('view');
+const crumbsEl = document.getElementById('crumbs');
+function goHome(){ state = {subject:null,nature:null,exam:null,pattern:null}; render(); }
+
+function renderCrumbs(){
+  const t = i18n[currentLang];
+  const c = [];
+  
+  if (!state.subject) {
+    c.push(`<span class="active">${t.home}</span>`);
+  } else {
+    c.push(`<span class="crumb-link" onclick="goHome()">${t.home}</span>`);
+  }
+
+  if (state.subject) {
+    const s = subjects.find(x => x.id === state.subject);
+    if (!state.nature) {
+      c.push(`<span class="sep">›</span><span class="active">${s.name[currentLang]}</span>`);
+    } else {
+      c.push(`<span class="sep">›</span><span class="crumb-link" onclick="backTo('nature')">${s.name[currentLang]}</span>`);
+    }
+  }
+
+  if (state.nature) {
+    const natureName = state.nature === 'theory' ? t.theory : t.practical;
+    if (!state.exam) {
+      c.push(`<span class="sep">›</span><span class="active">${natureName}</span>`);
+    } else {
+      c.push(`<span class="sep">›</span><span class="crumb-link" onclick="backTo('exam')">${natureName}</span>`);
+    }
+  }
+
+  if (state.exam) {
+    let examName = state.exam.toUpperCase();
+    if (!state.pattern) {
+      c.push(`<span class="sep">›</span><span class="active">${examName}</span>`);
+    } else {
+      c.push(`<span class="sep">›</span><span class="crumb-link" onclick="backTo('pattern')">${examName}</span>`);
+    }
+  }
+
+  if (state.pattern) {
+    const p = patterns.find(x => x.id === state.pattern);
+    c.push(`<span class="sep">›</span><span class="active">${p.name[currentLang]}</span>`);
+  }
+
+  crumbsEl.innerHTML = c.join('');
+}
+
+function render(){
+  renderCrumbs();
+  if(!state.subject) return renderSubjects();
+  if(!state.nature)  return renderNatures();
+  if(!state.exam)    return renderExams();
+  if(!state.pattern) return renderPatterns();
+  
+  const key = `${state.subject}_${state.nature}_${state.exam}_${state.pattern}`;
+  if(quizData[key]){
+    renderQuestionsList(quizData[key]);
+  } else {
+    renderSoon();
+  }
+}
+
+function cardHTML(id, icon, name, desc, onClick){
+  return `<div class="card" onclick="${onClick}"><div class="icon">${icon}</div><div class="name">${name}</div>${desc?`<div class="desc">${desc}</div>`:''}</div>`;
+}
+
+function renderSubjects(){
+  const t = i18n[currentLang];
+  view.innerHTML = `<h1 class="title">${t.selectSubjectTitle}</h1><p class="subtitle">${t.selectSubjectSub}</p><div class="grid">${subjects.map(s=>cardHTML(s.id,s.icon,s.name[currentLang],s.desc[currentLang],`selectSubject('${s.id}')`)).join('')}</div>`;
+}
+
+function renderNatures(){
+  const t = i18n[currentLang];
+  if(state.subject === 'stats'){ state.nature = 'theory'; return renderExams(); }
+  const natures = [{id:'practical', name:t.practical, icon:'🛠️'}, {id:'theory', name:t.theory, icon:'📚'}];
+  view.innerHTML = `<h1 class="title">${t.natureTitle}</h1><p class="subtitle">${t.natureSub}</p><div class="grid">${natures.map(n=>cardHTML(n.id,n.icon,n.name,'',`selectNature('${n.id}')`)).join('')}</div><button class="btn back" onclick="goHome()">${t.backHome}</button>`;
+}
+
+function renderExams(){
+  const t = i18n[currentLang];
+  let currentExams = (state.subject === 'stats') ? [{id:'midterm1', name:'Midterm 1', icon:'📝'},{id:'midterm2', name:'Midterm 2', icon:'📝'},{id:'final', name:'Final', icon:'🎯'}] : (state.nature === 'practical' ? [{id:'final', name:'Final', icon:'🎯'}] : [{id:'midterm', name:'Midterm', icon:'📝'},{id:'final', name:'Final', icon:'🎯'}]);
+  view.innerHTML = `<h1 class="title">${t.examTitle}</h1><p class="subtitle">${t.examSub}</p><div class="grid">${currentExams.map(e=>cardHTML(e.id,e.icon,e.name,'',`selectExam('${e.id}')`)).join('')}</div><button class="btn back" onclick="backTo('nature')">${t.back}</button>`;
+}
+
+function renderPatterns(){
+  const t = i18n[currentLang];
+  view.innerHTML = `<h1 class="title">${t.patternTitle}</h1><p class="subtitle">${t.patternSub}</p><div class="grid">${patterns.map(p=>cardHTML(p.id,p.icon,p.name[currentLang],'',`selectPattern('${p.id}')`)).join('')}</div><button class="btn back" onclick="backTo('exam')">${t.back}</button>`;
+}
+
+function renderQuestionsList(questions){
+  const t = i18n[currentLang];
+  const sName = subjects.find(x=>x.id===state.subject).name[currentLang];
+  const pName = patterns.find(x=>x.id===state.pattern).name[currentLang];
+  
+  let html = `<h1 class="title">${sName}</h1><p class="subtitle">${pName} • عدد الأسئلة: ${questions.length}</p><div class="quiz-container">`;
+  
+  questions.forEach((q) => {
+    html += `
+      <div class="q-card">
+        <div class="q-title">${q.titleEn}</div>
+        <div class="q-sub">${q.titleAr}</div>
+        
+        ${q.imageSrc ? `
+          <div class="question-image-box">
+            <img src="${q.imageSrc}" alt="رسمة السؤال">
+          </div>
+        ` : ''}
+        
+        ${q.ansEn ? `
+          <div class="answer-box">
+            <div class="answer-en"><strong>Answer:</strong><br>${q.ansEn}</div>
+            <div class="answer-ar">${q.ansAr}</div>
+          </div>
+        ` : ''}
+        
+        ${q.expEn ? `
+          <div class="explanation-box">
+            <div class="exp-en"><strong>Explanation / Notes:</strong><br>${q.expEn}</div>
+            <div class="exp-ar">${q.expAr}</div>
+          </div>
+        ` : ''}
+      </div>
+    `;
+  });
+  
+  html += `</div><button class="btn back" onclick="backTo('pattern')">${t.back}</button>`;
+  view.innerHTML = html;
+}
+
+function renderSoon(){
+  const t = i18n[currentLang];
+  view.innerHTML = `<h1 class="title">${t.soonTitle}</h1><div class="soon-box"><div class="emoji">🚧</div><h2>${t.soonTitle}</h2><p>${t.soonDesc}</p></div><button class="btn back" onclick="backTo('pattern')">${t.back}</button>`;
+}
+
+function selectSubject(id){ state.subject=id; render(); }
+function selectNature(id){ state.nature=id; render(); }
+function selectExam(id){ state.exam=id; render(); }
+function selectPattern(id){ state.pattern=id; render(); }
+
+function backTo(level){
+  if(level==='nature'){ state.nature=null; state.exam=null; state.pattern=null; if(state.subject==='stats') state.subject=null; }
+  if(level==='exam'){ state.exam=null; state.pattern=null; }
+  if(level==='pattern'){ state.pattern=null; }
+  render();
+}
+
+render();
+</script>
+</body>
+</html>
