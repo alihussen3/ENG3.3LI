@@ -501,7 +501,7 @@ const circuitsDsaData = {
     },
     {
       id: "LQ7_circuits",
-      titleEn: "Q7. Find Source Voltage Vs and Source Current Is.",
+      titleEn: "Q7. Find the source voltage Vs and the source current Is in a circuit where a branch containing 3kΩ has a current of 2mA.",
       titleAr: "س7. أوجد جهد المصدر Vs وتيار المصدر Is بدائرة يحتوي فرع 3kΩ فيها على تيار 2mA.",
       imageSrc: "images/D18.png",
       ansEn: "Given: Current through 3 kΩ resistor (I3) = 2 mA.<br>1. Voltage across 3 kΩ branch: V3 = I3 × R3 = 2 mA × 3 kΩ = 6 V.<br>2. Assuming 4 kΩ resistor is parallel with 3 kΩ resistor: I4 = V3 / R4 = 6 V / 4 kΩ = 1.5 mA.<br>3. Total Source Current: Is = I3 + I4 = 2 mA + 1.5 mA = 3.5 mA.<br>4. Assuming 2 kΩ resistor is in series with source: V_series = Is × 2 kΩ = 3.5 mA × 2 kΩ = 7 V.<br>5. Source Voltage: Vs = V_series + V3 = 7 V + 6 V = 13 V.",
@@ -511,7 +511,7 @@ const circuitsDsaData = {
     },
     {
       id: "LQ8_circuits",
-      titleEn: "Q8. Find Current and Voltage for Each Resistance.",
+      titleEn: "Q8. Find the current and voltage for each resistor, where R1 = 10kΩ, R2 = 2kΩ, R3 = 4kΩ, and the source voltage is 20V.",
       titleAr: "س8. أوجد قيمة التيار والجهد لكل مقاومة حيث R1=10kΩ, R2=2kΩ, R3=4kΩ وجُهد المصدر 20V.",
       imageSrc: "images/D19.png",
       ansEn: "Assuming Series Connection:<br>1. Total Resistance: RT = R1 + R2 + R3 = 10k + 2k + 4k = 16 kΩ.<br>2. Total Current: IT = Vs / RT = 20 V / 16 kΩ = 1.25 mA.<br>3. Voltage across R1 (10 kΩ): V1 = 1.25 mA × 10 kΩ = 12.5 V.<br>4. Voltage across R2 (2 kΩ): V2 = 1.25 mA × 2 kΩ = 2.5 V.<br>5. Voltage across R3 (4 kΩ): V3 = 1.25 mA × 4 kΩ = 5.0 V.",
@@ -521,7 +521,7 @@ const circuitsDsaData = {
     },
     {
       id: "LQ9_circuits",
-      titleEn: "Q9. Calculate Diode Power Dissipation. Will the Diode Be Destroyed?",
+      titleEn: "Q9. Calculate the power dissipated in the diode and clarify whether it will be damaged or not. (The allowable power is 3W, and the voltage is 2V and the current is 1.75A.)?",
       titleAr: "س9. احسب القدرة المتبددة في الدايود مع توضيح هل سيتلف أم لا؟ (القدرة المسموحة 3W والجهد 2V والتيار 1.75A).",
       imageSrc: "images/D20.png",
       ansEn: "Given: Rated Power (Prated) = 3 W, Diode Voltage (VD) = 2 V, Diode Current (ID) = 1.75 A.<br><br>1. Calculate Power Dissipation:<br>PD = VD × ID = 2 V × 1.75 A = 3.5 W<br><br>2. Evaluation:<br>Since actual power dissipation (3.5 W) exceeds the rated maximum power capacity (3 W), the diode will overheat and be destroyed.",
