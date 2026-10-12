@@ -36,7 +36,7 @@ const circuitsDsaData = {
         {txt: "(c) Current", ar: "تيار"},
         {txt: "(d) Resistor", ar: "مقاومة"}
       ],
-      ans: 2
+      ans: 0
     },
     {
       q: "4) Which of the following correctly describes Alternating Current (AC)?",
